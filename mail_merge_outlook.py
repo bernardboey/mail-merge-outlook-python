@@ -23,28 +23,6 @@ def extract_text_from_msg(path):
 	return subject, plain_text, html_text  # return the subject, plain text message, and html message
 
 
-def extract_text_from_email(path):
-	"""
-	This function takes in a .eml file name (outlook email file) and returns
-	the subject, and message text from the email
-	"""
-	with open(path, 'r') as file:  # read .eml file
-		msg = email.message_from_file(file)  # parse .eml file into message object
-		subject = msg["Subject"]  # store the subject of the email in a variable
-		plain_text = None  # initialise the plain text message as NULL
-		html_text = None  # initialise the html message as NULL
-		for part in msg.walk():  # "walk" through the sub parts of the .eml file
-			if(part.get_content_type() == "text/plain"):  # find the part contains the plain text message
-				plain_text = part.get_payload()  # store the plain text message in variable
-			if(part.get_content_type() == "text/html"):  # find the part contains the html message
-				html_text = part.get_payload()  # store the html message in variable
-		if plain_text is None and html_text is None:  # check if the plain text and html messages are missing
-			raise ValueError("Cannot find plain text/html")  # if yes, stop the program
-		plain_text = plain_text.replace("=\n","\n")
-		html_text = html_text.replace("=\n","\n")
-		return subject, plain_text, html_text  # return the subject, plain text message, and html message
-
-
 def get_sent_status_mac(message):
 	tmp = message.was_sent.get()
 

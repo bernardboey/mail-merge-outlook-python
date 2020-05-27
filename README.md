@@ -15,6 +15,8 @@ $ xcode-select --install
 ```
 $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
+During this installation, the terminal will prompt you to press the enter key to continue. Additionally, you will have to type in the password for your mac.
+Then, type the following:
 ```
 $ export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 ```

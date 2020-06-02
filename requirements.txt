@@ -1,0 +1,15 @@
+chardet==3.0.4
+et-xmlfile==1.0.1
+extract-msg==0.23.3
+IMAPClient==2.1.0
+jdcal==1.4.1
+numpy==1.18.4
+olefile==0.46
+openpyxl==3.0.3
+pandas==1.0.4
+python-dateutil==2.8.1
+pytz==2020.1
+pywin32==227
+six==1.15.0
+tzlocal==1.5.1
+xlrd==1.2.0

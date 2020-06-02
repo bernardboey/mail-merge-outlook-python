@@ -13,6 +13,7 @@ TIME_INTERVAL = 0.2
 USE_CATEGORIES = False
 VERIFY_EMAIL_PATH = "verification"
 
+
 def extract_text_from_msg(path):
 	msg = extract_msg.Message(path)
 	subject = msg.subject
@@ -252,6 +253,8 @@ def main():
 
 			for column in columns:
 				replacement = str(df[column][i])
+				if replacement == "nan":
+					replacement = ""
 				replacement = replacement.replace("\n","<br>")
 				html_text = html_text.replace(f"<<{column}>>", replacement)
 				html_text = html_text.replace(f"&lt;&lt;{column}&gt;&gt;", replacement)

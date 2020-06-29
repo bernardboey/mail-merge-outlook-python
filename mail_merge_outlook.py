@@ -38,7 +38,7 @@ HEADER_HTML = ('<div style = "width:60%; text-align:left; padding-left:20%; padd
                '</div>\n'
                '</body></html>')
 FOOTER_HTML = "</div>"
-INTRO_TEXT = ("\nWelcome to Python Mail Merge for Outlook! v1.1 Published 2 June 2020\n"
+INTRO_TEXT = ("\nWelcome to Python Mail Merge for Outlook! v0.6 Published 29 June 2020\n"
               "I require an Excel spreadsheet containing the data and a '.msg' file(s)"
               "that contain the message template(s). "
               "I assume that the Excel spreadsheet contains a 'Name' and 'Email' column.")
@@ -77,8 +77,8 @@ def input_excel_file():
 
 
 def process_excel_file(df):
-    columns = list(df.columns)
     df.drop(df.columns[df.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+    columns = list(df.columns)
     if "Mail Merge Status" in columns:
         for value in df["Mail Merge Status"].unique():
             if value not in ["Sent", "ERROR", "Not sent yet", "Not sure"]:
@@ -137,6 +137,27 @@ def extract_text_from_msg(path):
 
 def merge_emails(columns, df, message_templates, use_categories):
     emails_to_send = {}
+
+    # TODO: Don't assume the name of the column and ask for user input??
+
+    if "Email" in df.columns and "Emails" in df.columns:
+        raise RuntimeError("There shouldn't be both an 'Email' column and 'Emails' column")
+    elif "Emails" in df.columns:
+        email_column = "Emails"
+    elif 'Email' in df.columns:
+        email_column = "Email"
+    else:
+        raise RuntimeError("There should be an 'Email' or 'Emails' column")
+
+    if "Name" in df.columns and "Names" in df.columns:
+        raise RuntimeError("There shouldn't be both a 'Name' column and 'Names' column")
+    elif "Names" in df.columns:
+        name_column = "Names"
+    elif 'Name' in df.columns:
+        name_column = "Name"
+    else:
+        raise RuntimeError("There should be a 'Name' or 'Names' column")
+
     num_rows = len(df)
     for i in range(num_rows):
         if df["Mail Merge Status"][i] != "Sent":
@@ -145,8 +166,9 @@ def merge_emails(columns, df, message_templates, use_categories):
             else:
                 category = "No category"
             subject, plain_text, html_text = message_templates[category]
-            recipient_emails = [df["Email"][i]]  # Future: Don't assume the name of the column and ask for user input??
-            recipient_names = [df["Name"][i]]  # Future: Don't assume the name of the column and ask for user input??
+
+            recipient_emails = [email.strip() for email in df[email_column][i].split(";")]
+            recipient_names = [name.strip() for name in df[name_column][i].split(";")]
             cc_emails = []
 
             for column in columns:
@@ -158,6 +180,8 @@ def merge_emails(columns, df, message_templates, use_categories):
                 html_text = html_text.replace(f"&lt;&lt;{column}&gt;&gt;", replacement)
                 plain_text = plain_text.replace(f"<<{column}>>", replacement)
                 plain_text = plain_text.replace(f"&lt;&lt;{column}&gt;&gt;", replacement)
+                subject = subject.replace(f"<<{column}>>", replacement)
+                subject = subject.replace(f"&lt;&lt;{column}&gt;&gt;", replacement)
             emails_to_send[i] = [category, subject, recipient_names, recipient_emails, cc_emails, plain_text, html_text]
     return emails_to_send
 
@@ -213,8 +237,8 @@ def get_verify_email_html(email_num, total_num, prev_num, next_num, category, su
     header = header.replace("<<total_num>>", str(total_num))
     header = header.replace("<<category>>", category)
     header = header.replace("<<subject>>", subject)
-    header = header.replace("<<recipient_names>>", ";".join(recipient_names))
-    header = header.replace("<<recipient_emails>>", ";".join(recipient_emails))
+    header = header.replace("<<recipient_names>>", "; ".join(recipient_names))
+    header = header.replace("<<recipient_emails>>", "; ".join(recipient_emails))
     header = header.replace("<<cc_names>>", "")
     header = header.replace("<<cc_emails>>", ";".join(cc_emails))
     html = header + html_text + FOOTER_HTML

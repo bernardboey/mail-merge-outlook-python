@@ -158,6 +158,9 @@ def merge_emails(columns, df, message_templates, use_categories):
     else:
         raise RuntimeError("There should be a 'Name' or 'Names' column")
 
+    cc_column = "CC Email"
+    cc_names_column = "CC Names"
+
     num_rows = len(df)
     for i in range(num_rows):
         if df["Mail Merge Status"][i] != "Sent":
@@ -169,7 +172,8 @@ def merge_emails(columns, df, message_templates, use_categories):
 
             recipient_emails = [email.strip() for email in df[email_column][i].split(";")]
             recipient_names = [name.strip() for name in df[name_column][i].split(";")]
-            cc_emails = []
+            if cc_column in df.columns:
+                cc_emails = [email.strip() for email in df[cc_column][i].split(";")]
 
             for column in columns:
                 replacement = str(df[column][i])
